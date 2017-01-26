@@ -1,25 +1,25 @@
 // maka.js - part of make america kittens again
 // v1.1.2
-// by Tom Royal 
+// by Tom Royal
 // tomroyal.com
 
 var makaTesting = false; // for debugging only
 
 if (makaTesting){
 	console.log('maka initiated');
-	
-	if (typeof jQuery != 'undefined') {  
+
+	if (typeof jQuery != 'undefined') {
     	console.log('jQ loaded');
 	};
-	
+
 	var makaReplacements = 0;
-	
-}	
+
+}
 
 // init blacklist
 
 var blacklist = [];// global array
-blacklist.push("trump");
+blacklist.push("valls");
 
 // get additional settings from chrome storage
 
@@ -28,7 +28,7 @@ chrome.storage.local.get({
     blockFarage: false,
     blockLePen: false,
     blockWilders: false
-  }, function(items) { 
+  }, function(items) {
 	  if (items.blockPence){
 		  blacklist.push("mike pence");
 	  };
@@ -41,16 +41,16 @@ chrome.storage.local.get({
 	  if (items.blockWilders){
 		  blacklist.push("wilders");
 	  };
-	  
+
 	  document.addEventListener('DOMContentLoaded', makanow(theKittens), false);
-	  
+
   });
 
 // kitten data!
 // Note - update 1.0.1 moves these to Amazon S3, as my old server wasn't designed to take the amount of traffic that MAKA was generating. If you use this code, please host your own copy of the images - thanks!
 
 var theKittens = {"kitten": [
-    {"file": "1.jpg", "Credit": "Crsan", "URL": "http://www.flickr.com/photos/crsan/2571204498/", "type":"0"},
+  {"file": "1.jpg", "Credit": "Crsan", "URL": "http://www.flickr.com/photos/crsan/2571204498/", "type":"0"},
 	{"file": "2.jpg", "Credit": "Abcrumley", "URL": "http://www.flickr.com/photos/crumley/160490011/", "type":"0"},
 	{"file": "3.jpg", "Credit": "Woodchild2010", "URL": "http://www.flickr.com/photos/woodchild/5335939044/", "type":"0"},
 	{"file": "4.jpg", "Credit": "Vancouverfilmschool", "URL": "http://www.flickr.com/photos/vancouverfilmschool/4838552777/", "type":"0"},
@@ -92,12 +92,12 @@ function makanow(theKittens){
 	}
 
 	// called on page load. Searches all img alt text and srcs for the strings in blacklist, replaces with kittens
-	var pagepics=document.getElementsByTagName("img"), i=0, img;	
+	var pagepics=document.getElementsByTagName("img"), i=0, img;
 	while (img = pagepics[i++])
-	{	
+	{
 		var alttext = String(img.alt).toLowerCase();
 		var imgsrc = String(img.src).toLowerCase();
-		
+
 		if (img.parentElement.nodeName != 'BODY'){
 			// check parent innerHTML for blackilist
 			var parenttag = img.parentElement.innerHTML.toLowerCase();
@@ -106,17 +106,17 @@ function makanow(theKittens){
 			// prevent parse of entire doc
 			var parenttag = '';
 		};
-		
+
 		var imgwidth = img.clientWidth;
 		var imgheight = img.clientHeight;
 
-		
-		blacklist.forEach(function(blist) {	
+
+		blacklist.forEach(function(blist) {
 			if ((alttext.indexOf(blist) != -1) || (imgsrc.indexOf(blist) != -1) || (parenttag.indexOf(blist) != -1)){
-				
+
 				// remove srcsets, forcing browser to the kitten - eg, BBC News
 				if (img.hasAttribute('srcset')){
-					img.removeAttribute('srcset');	
+					img.removeAttribute('srcset');
 				};
 				// remove source srcsets if children of same parent <picture> element - eg, the Guardian
 				if (img.parentElement.nodeName == 'PICTURE'){
@@ -127,15 +127,15 @@ function makanow(theKittens){
 						    child.removeAttribute('srcset');
 					    };
 					};
-					
+
 				};
-				
+
 				// main replacement here
 				var randk = Math.floor(Math.random() * 33) + 1
 				img.src = 'https://s3.amazonaws.com/makapics/'+theKittens.kitten[randk].file+'';
 				img.width = imgwidth;
 				img.height = imgheight;
-				
+
 				if (theKittens.kitten[randk].type == 0){
 					img.alt = 'Photo by '+theKittens.kitten[randk].Credit+' source '+theKittens.kitten[randk].URL+'';
 				}
@@ -144,10 +144,9 @@ function makanow(theKittens){
 				};
 				makaReplacements++;
 			};
-		});		
+		});
 	}
 	if (makaTesting){
 		console.log('maka processing complete, replaced '+makaReplacements+' images');
-	}	    
+	}
 };
-
